@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ListViewWithFilters</string>
+    <string name="top_bar_text_idsa_guidelines">IDSA Guidelines</string>
+    <string name="click_to_select_filter_parameters">Click to select filter parameters</string>
+</resources>
