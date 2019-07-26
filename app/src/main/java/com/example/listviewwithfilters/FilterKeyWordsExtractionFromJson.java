@@ -4,17 +4,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class FilterKeyWordsExtractionFromJson {
 
 
     private String[] searchTagKeywords;
-    private String[] listOfChapterTitle;
+
+    private List<DataModelListViewChaptersList> listOfChaptersAndKeywords = new ArrayList<>();
 
     FilterKeyWordsExtractionFromJson(String jsonStringforSearchTagKeywords){
 
         String searchKeywordsArrayItems = "";
-        String chapterTitleStorage = "";
 
         try {
 
@@ -22,7 +25,6 @@ public class FilterKeyWordsExtractionFromJson {
             JSONArray guidelinesArray = mainJsonObject.getJSONArray("guidelines");
 
             StringBuilder stringBuilderforExtractingSearchTagKeywords = new StringBuilder();
-            StringBuilder stringBuilderForExtractionOfChapterTitles = new StringBuilder();
 
             for (int i = 0; i< guidelinesArray.length();i++){
 
@@ -34,7 +36,7 @@ public class FilterKeyWordsExtractionFromJson {
                     JSONObject objectsInsideChaptersArray = chaptersArray.getJSONObject(j);
                     JSONArray searchKeywordsArray = objectsInsideChaptersArray.getJSONArray("search_tag_keywords");
 
-                    stringBuilderForExtractionOfChapterTitles.append(objectsInsideChaptersArray.getString("chapter_title")).append("\n");
+                    listOfChaptersAndKeywords.add(new DataModelListViewChaptersList(objectsInsideChaptersArray));
 
                     for (int k = 0; k< searchKeywordsArray.length(); k++){
 
@@ -49,7 +51,7 @@ public class FilterKeyWordsExtractionFromJson {
                         JSONObject objectsInside2ndLevelChaptersArray = chaptersArrayInsideChaptersArray.getJSONObject(l);
                         JSONArray searchKeywordsArray1 = objectsInside2ndLevelChaptersArray.getJSONArray("search_tag_keywords");
 
-                        stringBuilderForExtractionOfChapterTitles.append(objectsInside2ndLevelChaptersArray.getString("chapter_title")).append("\n");
+                        listOfChaptersAndKeywords.add(new DataModelListViewChaptersList(objectsInside2ndLevelChaptersArray));
 
                         for (int m = 0; m< searchKeywordsArray1.length(); m++){
 
@@ -64,7 +66,6 @@ public class FilterKeyWordsExtractionFromJson {
             }
 
             searchKeywordsArrayItems = stringBuilderforExtractingSearchTagKeywords.toString();
-            chapterTitleStorage = stringBuilderForExtractionOfChapterTitles.toString();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -77,7 +78,6 @@ public class FilterKeyWordsExtractionFromJson {
         //hence, for time being the following approach is used.
 
         searchTagKeywords = searchKeywordsArrayItems.split("\n");
-        listOfChapterTitle = chapterTitleStorage.split("\n");
 
         for (int c = 0; c < searchTagKeywords.length; c++){
 
@@ -103,7 +103,7 @@ public class FilterKeyWordsExtractionFromJson {
         return searchTagKeywords;
     }
 
-    public String[] getListOfChapterTitle() {
-        return listOfChapterTitle;
+    public List<DataModelListViewChaptersList> getListOfChaptersAndKeywords() {
+        return listOfChaptersAndKeywords;
     }
 }

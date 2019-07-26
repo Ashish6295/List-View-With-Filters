@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
 
     ListView listViewChapterTitle;
+    Spinner spinnerDropdown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +34,16 @@ public class MainActivity extends AppCompatActivity {
         String jsonStringforSearchTagKeywords;
 
         ArrayList<String>listOfFilterParameters = new ArrayList<String>();
-        ArrayList<String>listOfChapterTitle = new ArrayList<String>();
 
         listViewChapterTitle = findViewById(R.id.listViewOfChapterTitles);
+
+        List<DataModelListViewChaptersList> chapterTitleObjectList = new ArrayList<>();
+
+        List<DataModelSpinnerAsFilter> selectedStateAndTitleForSpinner = new ArrayList<>();
+
+        spinnerDropdown = findViewById(R.id.spinnerPlaceHolder);
 //---------------------------------------------------------------------------------------------------------
+
         try {
             onlineJsonHolder = jsonFromUrl.execute(url).get();
         } catch (ExecutionException e) {
@@ -49,13 +57,6 @@ public class MainActivity extends AppCompatActivity {
 
         FilterKeyWordsExtractionFromJson filterKeywords = new FilterKeyWordsExtractionFromJson(jsonStringforSearchTagKeywords);
 
-        for(String s:filterKeywords.getListOfChapterTitle()){
-
-            if (!s.equals("\n"))
-                listOfChapterTitle.add(s);
-
-        }
-
         for(String s:filterKeywords.getSearchTagKeywords()){
 
             if (!s.equals(""))
@@ -63,7 +64,24 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        chapterTitleObjectList = filterKeywords.getListOfChaptersAndKeywords();
 
+        CustomAdapterListViewListOfTitle adapter = new CustomAdapterListViewListOfTitle(this, R.layout.list_item_chapter_title_list_view, chapterTitleObjectList);
+        listViewChapterTitle.setAdapter(adapter);
+
+        for (int i = 0; i < listOfFilterParameters.size(); i++){
+
+            DataModelSpinnerAsFilter spinnerAsFilter = new DataModelSpinnerAsFilter();
+            spinnerAsFilter.setCheckBoxTitle(listOfFilterParameters.get(i));
+
+            spinnerAsFilter.setSelected(false);
+
+            selectedStateAndTitleForSpinner.add(spinnerAsFilter);
+
+        }
+
+        CustomAdapterSpinner spinnerAdapter = new CustomAdapterSpinner(this,R.layout.spinner_checkbox_items,selectedStateAndTitleForSpinner);
+        spinnerDropdown.setAdapter(spinnerAdapter);
 
     }
 

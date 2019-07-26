@@ -2,4 +2,7 @@
     <string name="app_name">ListViewWithFilters</string>
     <string name="top_bar_text_idsa_guidelines">IDSA Guidelines</string>
     <string name="click_to_select_filter_parameters">Click to select filter parameters</string>
+    <string name="selectAllCheckBoxText">Organism</string>
+    <string name="organismAsFilterKeyword">text</string>
+    <string name="click_to_filter_spinner_defaultText">Click to filter</string>
 </resources>
