@@ -1,24 +1,37 @@
 package com.example.listviewwithfilters;
 
-public class DataModelSpinnerAsFilter {
+import java.util.ArrayList;
+import java.util.List;
+
+class DataModelSpinnerAsFilter {
 
     private String checkBoxTitle;
     private boolean isSelected;
 
-    public String getCheckBoxTitle() {
+    private boolean isSelectAllSelected = false;
+
+    boolean isSelectAllSelected() {
+        return isSelectAllSelected;
+    }
+
+    void setSelectAllSelected(boolean selectAllSelected) {
+        isSelectAllSelected = selectAllSelected;
+    }
+
+    String getCheckBoxTitle() {
         return checkBoxTitle;
     }
 
-    public void setCheckBoxTitle(String checkBoxTitle) {
+    void setCheckBoxTitle(String checkBoxTitle) {
         this.checkBoxTitle = checkBoxTitle;
     }
 
-    public boolean isSelected() {
+    boolean isSelected() {
         return isSelected;
     }
 
-    public void setSelected(boolean selected) {
+    void setSelected(boolean selected) {
         isSelected = selected;
     }
-
+    
 }

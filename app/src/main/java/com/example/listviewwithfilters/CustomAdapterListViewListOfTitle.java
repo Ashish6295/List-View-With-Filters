@@ -7,12 +7,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CustomAdapterListViewListOfTitle extends ArrayAdapter<DataModelListViewChaptersList> {
 
-    public CustomAdapterListViewListOfTitle(Context context, int resource, List<DataModelListViewChaptersList> chapterTitleList){
+    List<String>checkedFilterKeywords;
+    List<DataModelListViewChaptersList> chaptersTitleList;
+
+    CustomAdapterListViewListOfTitle(Context context, int resource, List<DataModelListViewChaptersList> chapterTitleList){
         super(context, resource, chapterTitleList);
+        this.chaptersTitleList = chapterTitleList;
     }
 
     @Override
@@ -27,8 +32,8 @@ public class CustomAdapterListViewListOfTitle extends ArrayAdapter<DataModelList
         TextView textViewChapterTitle = convertView.findViewById(R.id.displayChapterTextView);
         TextView textViewSearchTagKeyword = convertView.findViewById(R.id.displaySearchKeywordTextView);
 
-        textViewChapterTitle.setText(listViewChaptersList.getChapterTitle());
-        textViewSearchTagKeyword.setText(listViewChaptersList.getSearchTagKeywords());
+        textViewChapterTitle.setText(chaptersTitleList.get(position).getChapterTitle());
+        textViewSearchTagKeyword.setText(chaptersTitleList.get(position).getSearchTagKeywords());
 
         return convertView;
     }

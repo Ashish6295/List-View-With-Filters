@@ -1,30 +1,29 @@
 package com.example.listviewwithfilters;
 
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class CustomAdapterSpinner extends ArrayAdapter<DataModelSpinnerAsFilter> {
 
-    boolean isCheckedFromCustomAdapterView = false;
-    List<DataModelSpinnerAsFilter>listOfKeywordsAndCheckedStatus = new ArrayList<>();
+     List<DataModelSpinnerAsFilter> listOfKeywordsAndCheckedStatus;
+     CheckedItemListSpinner checkedItemListSpinner = new CheckedItemListSpinner();
+     Context context;
+     FilterListView filterListView;
 
-    SelectAllStatusHolderSpinner selectAllCheckBoxCheckedStatus = new SelectAllStatusHolderSpinner();
-
-    public CustomAdapterSpinner(Context context, int resource, List<DataModelSpinnerAsFilter> listOfKeywordsAndCheckedStatus){
-        super(context,resource,listOfKeywordsAndCheckedStatus);
+    CustomAdapterSpinner(Context context, int resource, List<DataModelSpinnerAsFilter> listOfKeywordsAndCheckedStatus,FilterListView filterListView) {
+        super(context, resource,listOfKeywordsAndCheckedStatus);
         this.listOfKeywordsAndCheckedStatus = listOfKeywordsAndCheckedStatus;
+        this.context = context;
+        this.filterListView = filterListView;
     }
 
     @Override
@@ -33,52 +32,109 @@ public class CustomAdapterSpinner extends ArrayAdapter<DataModelSpinnerAsFilter>
     }
 
     @Override
+    public int getCount() {
+        return listOfKeywordsAndCheckedStatus.size();
+    }
+
+    @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         final DataModelSpinnerAsFilter listOfFilterParameters = getItem(position);
 
-        if (convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.spinner_checkbox_items, parent,false);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.spinner_checkbox_items, parent, false);
         }
 
+//---------------------------------------------------------------------------------------------------------------
         LinearLayout selectAllLinearLayout = convertView.findViewById(R.id.layoutForSelectAllCheckBox);
         TextView textViewForDefaultText = convertView.findViewById(R.id.defaultTextForSpinner);
 
+        LinearLayout buttonsLayout = convertView.findViewById(R.id.layoutForButtons);
+
         TextView textViewCheckBoxTitle = convertView.findViewById(R.id.textForCheckBox);
-        CheckBox checkBox = convertView.findViewById(R.id.Checkbox);
+        final CheckBox checkBox = convertView.findViewById(R.id.Checkbox);
         final CheckBox checkBoxSelectAll = convertView.findViewById(R.id.selectAllCheckbox);
 
-        if (position!=0){
+        Button applyFilterButton = convertView.findViewById(R.id.buttonApplyFilter);
+//----------------------------------------------------------------------------------------------------------------
+
+        textViewCheckBoxTitle.setText(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
+
+        if (position != 0) {
             selectAllLinearLayout.setVisibility(View.GONE);
             textViewForDefaultText.setVisibility(View.GONE);
-        }else {
+        } else {
             selectAllLinearLayout.setVisibility(View.VISIBLE);
             textViewForDefaultText.setVisibility(View.VISIBLE);
         }
 
-        if (selectAllCheckBoxCheckedStatus.isSelectAllSelected()){
-            checkBox.setChecked(true);
-        }else {
-            checkBox.setChecked(false);
+        if (position == (listOfKeywordsAndCheckedStatus.size()-1)) {
+            buttonsLayout.setVisibility(View.VISIBLE);
+        } else {
+            buttonsLayout.setVisibility(View.GONE);
         }
 
-        textViewCheckBoxTitle.setText(listOfFilterParameters.getCheckBoxTitle());
+        if (listOfKeywordsAndCheckedStatus.get(position).isSelectAllSelected())
+            checkBox.setEnabled(false);
+        else if (!listOfKeywordsAndCheckedStatus.get(position).isSelectAllSelected())
+            checkBox.setEnabled(true);
+//---------------------------------------------------------------------------------------------------------------
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+
+                if (isChecked) {
+                    listOfKeywordsAndCheckedStatus.get(position).setSelected(true);
+                    //checkedItemListSpinner.getCheckedFilterParameters().add(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
+                }else {
+                    listOfKeywordsAndCheckedStatus.get(position).setSelected(false);
+                    //checkedItemListSpinner.getCheckedFilterParameters().remove(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
+                }
+
+                if (listOfKeywordsAndCheckedStatus.get(position).isSelected() && !checkedItemListSpinner.getCheckedFilterParameters().contains(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle())){
+                    checkedItemListSpinner.getCheckedFilterParameters().add(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
+                }else if (!listOfKeywordsAndCheckedStatus.get(position).isSelected()){
+                    checkedItemListSpinner.getCheckedFilterParameters().remove(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
+                }
+
+            }
+        });
 
         checkBoxSelectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
 
-                if (isChecked) {
-                    selectAllCheckBoxCheckedStatus.setSelectAllSelected(true);
-                }else{
-                    selectAllCheckBoxCheckedStatus.setSelectAllSelected(false);
+                for (int i = 0; i < listOfKeywordsAndCheckedStatus.size(); i++) {
+                    if (isChecked) {
+                        listOfKeywordsAndCheckedStatus.get(i).setSelected(true);
+                        listOfKeywordsAndCheckedStatus.get(i).setSelectAllSelected(true);
+                    } else {
+                        listOfKeywordsAndCheckedStatus.get(i).setSelected(false);
+                        listOfKeywordsAndCheckedStatus.get(i).setSelectAllSelected(false);
+                    }
                 }
-
                 notifyDataSetChanged();
-
             }
         });
 
+        checkBox.setChecked(listOfKeywordsAndCheckedStatus.get(position).isSelected());
+
+//        if (listOfKeywordsAndCheckedStatus.get(position).isSelected() && !checkedItemListSpinner.getCheckedFilterParameters().contains(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle())){
+//            checkedItemListSpinner.getCheckedFilterParameters().add(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
+//        }else if (!listOfKeywordsAndCheckedStatus.get(position).isSelected()){
+//            checkedItemListSpinner.getCheckedFilterParameters().remove(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
+//        }
+
+//---------------------------------------------------------------------------------------------------------------
+
+        applyFilterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                  filterListView.onClickApplyFilter(checkedItemListSpinner.getCheckedFilterParameters());
+            }
+        });
+
+//---------------------------------------------------------------------------------------------------------------
         return convertView;
     }
 }

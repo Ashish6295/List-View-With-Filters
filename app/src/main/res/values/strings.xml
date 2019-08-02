@@ -5,4 +5,6 @@
     <string name="selectAllCheckBoxText">Organism</string>
     <string name="organismAsFilterKeyword">text</string>
     <string name="click_to_filter_spinner_defaultText">Click to filter</string>
+    <string name="apply_filter_button">Apply Filter</string>
+    <string name="cancel_button">Cancel</string>
 </resources>
