@@ -7,13 +7,13 @@
     <TextView
         android:id="@+id/defaultTextForSpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="41dp"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
+        android:gravity="center_horizontal|center_vertical"
         android:text="@string/click_to_filter_spinner_defaultText" />
 
     <LinearLayout

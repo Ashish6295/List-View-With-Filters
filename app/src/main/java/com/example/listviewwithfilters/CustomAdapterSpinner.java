@@ -10,24 +10,25 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 public class CustomAdapterSpinner extends ArrayAdapter<DataModelSpinnerAsFilter> {
 
-     List<DataModelSpinnerAsFilter> listOfKeywordsAndCheckedStatus;
-     CheckedItemListSpinner checkedItemListSpinner = new CheckedItemListSpinner();
-     Context context;
-     FilterListView filterListView;
+     private List<DataModelSpinnerAsFilter> listOfKeywordsAndCheckedStatus;
+     private CheckedItemListSpinner checkedItemListSpinner = new CheckedItemListSpinner();
+     private FilterListView filterListView;
 
     CustomAdapterSpinner(Context context, int resource, List<DataModelSpinnerAsFilter> listOfKeywordsAndCheckedStatus,FilterListView filterListView) {
         super(context, resource,listOfKeywordsAndCheckedStatus);
         this.listOfKeywordsAndCheckedStatus = listOfKeywordsAndCheckedStatus;
-        this.context = context;
         this.filterListView = filterListView;
     }
 
     @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
         return getView(position, convertView, parent);
     }
 
@@ -36,10 +37,9 @@ public class CustomAdapterSpinner extends ArrayAdapter<DataModelSpinnerAsFilter>
         return listOfKeywordsAndCheckedStatus.size();
     }
 
+    @NonNull
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-
-        final DataModelSpinnerAsFilter listOfFilterParameters = getItem(position);
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.spinner_checkbox_items, parent, false);
@@ -119,18 +119,13 @@ public class CustomAdapterSpinner extends ArrayAdapter<DataModelSpinnerAsFilter>
 
         checkBox.setChecked(listOfKeywordsAndCheckedStatus.get(position).isSelected());
 
-//        if (listOfKeywordsAndCheckedStatus.get(position).isSelected() && !checkedItemListSpinner.getCheckedFilterParameters().contains(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle())){
-//            checkedItemListSpinner.getCheckedFilterParameters().add(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
-//        }else if (!listOfKeywordsAndCheckedStatus.get(position).isSelected()){
-//            checkedItemListSpinner.getCheckedFilterParameters().remove(listOfKeywordsAndCheckedStatus.get(position).getCheckBoxTitle());
-//        }
-
 //---------------------------------------------------------------------------------------------------------------
 
         applyFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                   filterListView.onClickApplyFilter(checkedItemListSpinner.getCheckedFilterParameters());
+                  
             }
         });
 

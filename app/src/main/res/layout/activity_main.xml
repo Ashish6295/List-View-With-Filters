@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="10"
+    android:weightSum="9"
     android:orientation="vertical"
 
     tools:context=".MainActivity">
@@ -14,7 +13,7 @@
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.75"
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/top_bar_text_idsa_guidelines"
         android:textSize="20sp"
@@ -24,20 +23,16 @@
     <Spinner
         android:id="@+id/spinnerPlaceHolder"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.70"
-        android:layout_marginTop="5dp">
-
-
-
-    </Spinner>
+        android:layout_height="41dp"
+        android:layout_marginTop="5dp"/>
 
     <ListView
         android:id="@+id/listViewOfChapterTitles"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8.3">
+        android:layout_weight="8.25">
     </ListView>
 
 </LinearLayout>

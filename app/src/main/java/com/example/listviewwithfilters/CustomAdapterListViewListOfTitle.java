@@ -7,23 +7,22 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 public class CustomAdapterListViewListOfTitle extends ArrayAdapter<DataModelListViewChaptersList> {
 
-    List<String>checkedFilterKeywords;
-    List<DataModelListViewChaptersList> chaptersTitleList;
+    private List<DataModelListViewChaptersList> chaptersTitleList;
 
     CustomAdapterListViewListOfTitle(Context context, int resource, List<DataModelListViewChaptersList> chapterTitleList){
         super(context, resource, chapterTitleList);
         this.chaptersTitleList = chapterTitleList;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        DataModelListViewChaptersList listViewChaptersList = getItem(position);
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_chapter_title_list_view, parent, false);

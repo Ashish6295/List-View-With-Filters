@@ -1,15 +1,11 @@
 package com.example.listviewwithfilters;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.Spinner;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements FilterListView{
@@ -18,11 +14,12 @@ public class MainActivity extends AppCompatActivity implements FilterListView{
     Spinner spinnerDropdown;
 
     List<DataModelListViewChaptersList> chapterTitleObjectList;
+    ArrayList<String>listOfFilterParameters = new ArrayList<>();
 
     CustomAdapterListViewListOfTitle adapter;
     CheckedItemListSpinner checkedItemListSpinner;
 
-    FilterKeyWordsExtractionFromJson filterKeywords;
+    PostProcessingOnLocalJson processedLocalJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +33,7 @@ public class MainActivity extends AppCompatActivity implements FilterListView{
 
         GetJsonFromUrl jsonFromUrl = new GetJsonFromUrl();
 
-        String jsonStringforSearchTagKeywords;
-
-        ArrayList<String>listOfFilterParameters = new ArrayList<String>();
+        String jsonReadFromInternalStorage;
 
         listViewChapterTitle = findViewById(R.id.listViewOfChapterTitles);
 
@@ -47,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements FilterListView{
         checkedItemListSpinner = new CheckedItemListSpinner();
 
         spinnerDropdown = findViewById(R.id.spinnerPlaceHolder);
-        //Button btnApplyFilter = findViewById(R.id.buttonApplyFilter);
 //---------------------------------------------------------------------------------------------------------
 
         try {
@@ -59,16 +53,16 @@ public class MainActivity extends AppCompatActivity implements FilterListView{
         }
 
         ReadWriteOnLocalJson readWriteOperationOnLocalJson = new ReadWriteOnLocalJson(onlineJsonHolder,this);
-        jsonStringforSearchTagKeywords = readWriteOperationOnLocalJson.getReadContent();
+        jsonReadFromInternalStorage = readWriteOperationOnLocalJson.getReadContent();
 
-        filterKeywords = new FilterKeyWordsExtractionFromJson(jsonStringforSearchTagKeywords);
+        processedLocalJson = new PostProcessingOnLocalJson(jsonReadFromInternalStorage);
 
-        chapterTitleObjectList = filterKeywords.getListOfChaptersAndKeywords();
+        chapterTitleObjectList = processedLocalJson.getListOfChaptersAndKeywords();
 
         adapter = new CustomAdapterListViewListOfTitle(this, R.layout.list_item_chapter_title_list_view, chapterTitleObjectList);
         listViewChapterTitle.setAdapter(adapter);
 
-        for(String s:filterKeywords.getSearchTagKeywords()){
+        for(String s:processedLocalJson.getSearchTagKeywords()){
 
             if (!s.equals(""))
                 listOfFilterParameters.add(s);
@@ -88,36 +82,29 @@ public class MainActivity extends AppCompatActivity implements FilterListView{
 
         CustomAdapterSpinner spinnerAdapter = new CustomAdapterSpinner(this,R.layout.spinner_checkbox_items,selectedStateAndTitleForSpinner,this);
         spinnerDropdown.setAdapter(spinnerAdapter);
-
     }
 
     @Override
     public void onClickApplyFilter(List<String> data) {
 
-        List<DataModelListViewChaptersList> chapterTitleObjectList1 = chapterTitleObjectList;
+        List<DataModelListViewChaptersList> chapterTitleObjectList1 = new ArrayList<>();
 
-        if (data.size() == 0|| data.size()==5){
-            adapter = new CustomAdapterListViewListOfTitle(this, R.layout.list_item_chapter_title_list_view, chapterTitleObjectList);
-            listViewChapterTitle.setAdapter(adapter);
-
+        if (data.size() == 0|| data.size()==listOfFilterParameters.size()){
+            chapterTitleObjectList1 = chapterTitleObjectList;
         }else{
-
-            for (int i = 0; i < chapterTitleObjectList1.size(); i++){
+            for (int i = 0; i < chapterTitleObjectList.size(); i++){
 
                 for (int j = 0; j < data.size(); j++){
 
-                    if (!chapterTitleObjectList1.get(i).getSearchTagKeywords().contains(data.get(j))) {
-                        chapterTitleObjectList1.remove(i);
+                    if (chapterTitleObjectList.get(i).getSearchTagKeywords().contains(data.get(j)) || (chapterTitleObjectList.get(i).getSearchTagKeywords().equals(" "))) {
+                        chapterTitleObjectList1.add(chapterTitleObjectList.get(i));
+                        break;
                     }
-
                 }
-
             }
-
         }
 
         adapter = new CustomAdapterListViewListOfTitle(this, R.layout.list_item_chapter_title_list_view, chapterTitleObjectList1);
         listViewChapterTitle.setAdapter(adapter);
-
     }
 }
