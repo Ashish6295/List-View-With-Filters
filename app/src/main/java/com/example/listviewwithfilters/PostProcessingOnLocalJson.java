@@ -5,26 +5,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 class PostProcessingOnLocalJson {
 
-
-    private String[] searchTagKeywords;
-
+    private List<DataModelSpinnerAsFilter> selectedStateAndTitleForSpinner = new ArrayList<>();
     private List<DataModelListViewChaptersList> listOfChaptersAndKeywords = new ArrayList<>();
 
-    PostProcessingOnLocalJson(String jsonStringForSearchTagKeywords){
+    PostProcessingOnLocalJson(String jsonReadFromLocalFile){
 
-        String searchKeywordsArrayItems = "";
+        Set<String> listOfKeywords = new HashSet<>();
 
         try {
 
-            JSONObject mainJsonObject = new JSONObject(jsonStringForSearchTagKeywords);
+            JSONObject mainJsonObject = new JSONObject(jsonReadFromLocalFile);
             JSONArray guidelinesArray = mainJsonObject.getJSONArray("guidelines");
-
-            StringBuilder stringBuilderForExtractingSearchTagKeywords = new StringBuilder();
 
             for (int i = 0; i < guidelinesArray.length();i++){
 
@@ -39,9 +37,7 @@ class PostProcessingOnLocalJson {
                     listOfChaptersAndKeywords.add(new DataModelListViewChaptersList(objectsInsideChaptersArray));
 
                     for (int k = 0; k < searchKeywordsArray.length(); k++){
-
-                        stringBuilderForExtractingSearchTagKeywords.append(searchKeywordsArray.get(k)).append("\n");
-
+                        listOfKeywords.add(searchKeywordsArray.get(k).toString());
                     }
 
                     JSONArray chaptersArrayInsideChaptersArray = objectsInsideChaptersArray.getJSONArray("chapters");
@@ -54,9 +50,7 @@ class PostProcessingOnLocalJson {
                         listOfChaptersAndKeywords.add(new DataModelListViewChaptersList(objectsInside2ndLevelChaptersArray));
 
                         for (int m = 0; m < searchKeywordsArray1.length(); m++){
-
-                            stringBuilderForExtractingSearchTagKeywords.append(searchKeywordsArray1.get(m)).append("\n");
-
+                            listOfKeywords.add(searchKeywordsArray1.get(m).toString());
                         }
 
                     }
@@ -65,42 +59,29 @@ class PostProcessingOnLocalJson {
 
             }
 
-            searchKeywordsArrayItems = stringBuilderForExtractingSearchTagKeywords.toString();
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        listOfKeywords.remove("");
 
-        //the below loop is used to remove duplicate value from String, duplicate values are replaced with blank i.e ""
-        //then in main activity list is used to add all values inside array except "". hence, we have a list which has no duplicates and only unique value
-        //A better approach would have been to use Set to store unique elements but i would have had to read about the concept and then try them.
-        //hence, for time being the following approach is used.
+        List<String> listOfUniqueKeywords = new ArrayList<>(listOfKeywords);
 
-        searchTagKeywords = searchKeywordsArrayItems.split("\n");
+        for (int i = 0; i < listOfUniqueKeywords.size(); i++){
 
-        for (int c = 0; c < searchTagKeywords.length; c++){
+            DataModelSpinnerAsFilter spinnerAsFilter = new DataModelSpinnerAsFilter();
+            spinnerAsFilter.setCheckBoxTitle(listOfUniqueKeywords.get(i));
 
-            if (searchTagKeywords[c]!=null){
+            spinnerAsFilter.setSelected(false);
 
-                for(int j = c + 1; j < searchTagKeywords.length; j++)
-                {
-
-                    if(searchTagKeywords[c].equals(searchTagKeywords[j]))
-                    {
-                        searchTagKeywords[j]="";
-                    }
-
-                }
-
-            }
+            selectedStateAndTitleForSpinner.add(spinnerAsFilter);
 
         }
 
     }
 
-    String[] getSearchTagKeywords() {
-        return searchTagKeywords;
+    List<DataModelSpinnerAsFilter> getSelectedStateAndTitleForSpinner() {
+        return selectedStateAndTitleForSpinner;
     }
 
     List<DataModelListViewChaptersList> getListOfChaptersAndKeywords() {

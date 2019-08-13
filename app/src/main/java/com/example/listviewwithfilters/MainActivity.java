@@ -6,19 +6,13 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements FilterListView{
 
     ListView listViewChapterTitle;
-    Spinner spinnerDropdown;
-
-    List<DataModelListViewChaptersList> chapterTitleObjectList;
-    ArrayList<String>listOfFilterParameters = new ArrayList<>();
-
     CustomAdapterListViewListOfTitle adapter;
-    CheckedItemListSpinner checkedItemListSpinner;
-
     PostProcessingOnLocalJson processedLocalJson;
 
     @Override
@@ -26,61 +20,25 @@ public class MainActivity extends AppCompatActivity implements FilterListView{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//-----------------------Declarations----------------------------------------------------------------------
-
-        String url = "https://s3-eu-west-1.amazonaws.com/bbi.appsdata.2013/guideline-cdiff.json";
-        String onlineJsonHolder ="";
-
+        listViewChapterTitle = findViewById(R.id.listViewOfChapterTitles);
+        Spinner spinnerDropdown = findViewById(R.id.spinnerPlaceHolder);
         GetJsonFromUrl jsonFromUrl = new GetJsonFromUrl();
 
-        String jsonReadFromInternalStorage;
-
-        listViewChapterTitle = findViewById(R.id.listViewOfChapterTitles);
-
-        List<DataModelSpinnerAsFilter> selectedStateAndTitleForSpinner = new ArrayList<>();
-
-        checkedItemListSpinner = new CheckedItemListSpinner();
-
-        spinnerDropdown = findViewById(R.id.spinnerPlaceHolder);
-//---------------------------------------------------------------------------------------------------------
+        ReadWriteOnLocalJson readWriteOperationOnLocalJson = null;
 
         try {
-            onlineJsonHolder = jsonFromUrl.execute(url).get();
+            readWriteOperationOnLocalJson = new ReadWriteOnLocalJson(jsonFromUrl.execute("https://s3-eu-west-1.amazonaws.com/bbi.appsdata.2013/guideline-cdiff.json").get(),this);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        processedLocalJson = new PostProcessingOnLocalJson(Objects.requireNonNull(readWriteOperationOnLocalJson).getReadContent());
 
-        ReadWriteOnLocalJson readWriteOperationOnLocalJson = new ReadWriteOnLocalJson(onlineJsonHolder,this);
-        jsonReadFromInternalStorage = readWriteOperationOnLocalJson.getReadContent();
-
-        processedLocalJson = new PostProcessingOnLocalJson(jsonReadFromInternalStorage);
-
-        chapterTitleObjectList = processedLocalJson.getListOfChaptersAndKeywords();
-
-        adapter = new CustomAdapterListViewListOfTitle(this, R.layout.list_item_chapter_title_list_view, chapterTitleObjectList);
+        adapter = new CustomAdapterListViewListOfTitle(this, R.layout.list_item_chapter_title_list_view, processedLocalJson.getListOfChaptersAndKeywords());
         listViewChapterTitle.setAdapter(adapter);
 
-        for(String s:processedLocalJson.getSearchTagKeywords()){
-
-            if (!s.equals(""))
-                listOfFilterParameters.add(s);
-
-        }
-
-        for (int i = 0; i < listOfFilterParameters.size(); i++){
-
-            DataModelSpinnerAsFilter spinnerAsFilter = new DataModelSpinnerAsFilter();
-            spinnerAsFilter.setCheckBoxTitle(listOfFilterParameters.get(i));
-
-            spinnerAsFilter.setSelected(false);
-
-            selectedStateAndTitleForSpinner.add(spinnerAsFilter);
-
-        }
-
-        CustomAdapterSpinner spinnerAdapter = new CustomAdapterSpinner(this,R.layout.spinner_checkbox_items,selectedStateAndTitleForSpinner,this);
+        CustomAdapterSpinner spinnerAdapter = new CustomAdapterSpinner(this,R.layout.spinner_checkbox_items, processedLocalJson.getSelectedStateAndTitleForSpinner(),this);
         spinnerDropdown.setAdapter(spinnerAdapter);
     }
 
@@ -89,15 +47,15 @@ public class MainActivity extends AppCompatActivity implements FilterListView{
 
         List<DataModelListViewChaptersList> chapterTitleObjectList1 = new ArrayList<>();
 
-        if (data.size() == 0|| data.size()==listOfFilterParameters.size()){
-            chapterTitleObjectList1 = chapterTitleObjectList;
+        if (data.size() == 0|| data.size() == processedLocalJson.getSelectedStateAndTitleForSpinner().size()){
+            chapterTitleObjectList1 = processedLocalJson.getListOfChaptersAndKeywords();
         }else{
-            for (int i = 0; i < chapterTitleObjectList.size(); i++){
+            for (int i = 0; i < processedLocalJson.getListOfChaptersAndKeywords().size(); i++){
 
                 for (int j = 0; j < data.size(); j++){
 
-                    if (chapterTitleObjectList.get(i).getSearchTagKeywords().contains(data.get(j)) || (chapterTitleObjectList.get(i).getSearchTagKeywords().equals(" "))) {
-                        chapterTitleObjectList1.add(chapterTitleObjectList.get(i));
+                    if (processedLocalJson.getListOfChaptersAndKeywords().get(i).getSearchTagKeywords().contains(data.get(j)) || (processedLocalJson.getListOfChaptersAndKeywords().get(i).getSearchTagKeywords().equals(" "))) {
+                        chapterTitleObjectList1.add(processedLocalJson.getListOfChaptersAndKeywords().get(i));
                         break;
                     }
                 }
